@@ -1,15 +1,15 @@
-MODULE_NAME := hack
-RESMAN_CORE_OBJS:=entry.o
-RESMAN_GLUE_OBJS:=
 ifneq ($(KERNELRELEASE),)
-	obj-m := $(MODULE_NAME).o
-	$(MODULE_NAME)-objs:=$(RESMAN_GLUE_OBJS) $(RESMAN_CORE_OBJS)
+# kbuild part of makefile
+	obj-$(CONFIG_MEMKERNEL)  := memkernel.o
+	memkernel-y := memory.o process.o entry.o
 else
-	KDIR := /home/administrator/桌面/munch-s-oss/out
-all:
-	make -j$(nproc) -C $(KDIR) M=$(shell pwd) LLVM=1 LLVM_IAS=1 ARCH=arm64 CC=clang LD=ld.lld OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump NM=llvm-nm STRIP=llvm-strip modules
-	rm -rf *.o *.mod .*.*.cmd *.mod.o *.mod.c *.symvers *.order .tmp_versions
-	llvm-strip --strip-debug $(MODULE_NAME).ko
+# normal makefile
+default:
+	# Assume kernel source is at KDIR or fail
+	ifeq ($(KDIR),)
+		$(error KDIR is not set. Please define KDIR to point to the kernel source directory.)
+	endif
+	make -C $(KDIR) M=$(PWD) modules
 clean:
-	rm -rf *.ko *.o *.mod .*.*.cmd *.mod.o *.mod.c *.symvers *.order .tmp_versions
+	rm -f *.ko *.o *.mod.o *.mod.c *.symvers .*.cmd
 endif
