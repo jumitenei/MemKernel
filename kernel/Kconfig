@@ -1,6 +1,8 @@
-config KERNEL_HACK
-    tristate "Kernel Hack Driver"
+config MEMKERNEL
+    tristate "Physical Mem Operation Driver"
     default y
     help
-    This is the kernel hack driver for android system.
-
+      Read-Write physical memory of target process.
+      Also retrieves base address of any library within any target process.
+      Y to statically build within kernel.
+      M to build as loadable kernel module (lkm).
